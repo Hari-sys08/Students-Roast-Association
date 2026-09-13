@@ -1,0 +1,133 @@
+import type { ChatMessage } from '../types/workspace';
+
+const CONVERSATION_STORAGE_KEY = 'web-dev-agent-conversation-id';
+
+export function createConversationId() {
+  return typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `conversation-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+export function getOrCreateCachedConversationId() {
+  if (typeof window === 'undefined') {
+    return createConversationId();
+  }
+
+  const stored = window.localStorage.getItem(CONVERSATION_STORAGE_KEY)?.trim();
+  if (stored) {
+    return stored;
+  }
+
+  const next = createConversationId();
+  window.localStorage.setItem(CONVERSATION_STORAGE_KEY, next);
+  return next;
+}
+
+// Read the cached conversationId without minting a new one. Returns null on a
+// first visit — used to decide whether there is anything to resume at all, so a
+// brand-new visitor skips the "restoring…" screen entirely.
+export function getStoredConversationId() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  return window.localStorage.getItem(CONVERSATION_STORAGE_KEY)?.trim() || null;
+}
+
+export function cacheConversationId(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed || typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.setItem(CONVERSATION_STORAGE_KEY, trimmed);
+}
+
+export function clearCachedConversationId() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.removeItem(CONVERSATION_STORAGE_KEY);
+}
+
+export function createMessageId(role: ChatMessage['role']) {
+  return `${role}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+export function sanitizeThinkingContent(value: string) {
+  return value
+    .replace(/\x1b\[[0-9;?]*[~A-Za-z]/g, '')
+    .replace(/\[20[01]~/g, '')
+    .replace(/\x1b\][^\x07]*\x07/g, '')
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
+    .replace(/<think\b[^>]*>/gi, '')
+    .replace(/<\/think>/gi, '')
+    .replace(/\n{4,}/g, '\n\n\n')
+    .replace(/<t(?:h(?:i(?:n(?:k(?:\b[^>]*)?)?)?)?)?$/i, '');
+}
+
+export function extractProjectName() {
+  if (typeof window === 'undefined') {
+    return {
+      projectName: '',
+      domain: '',
+    };
+  }
+
+  var fullUrl = window.location.href;
+  var urlObject = new URL(fullUrl);
+  var hostname = urlObject.hostname;
+  var parts = hostname.split('.');
+  return {
+    projectName: parts[0].replace('-zh', ''),
+    domain: parts.slice(1).join('.'),
+  };
+}
+
+// Where this template's own code lives, for a reader who wants it rather than a copy.
+export const TEMPLATE_SOURCE_URL = 'https://github.com/TencentEdgeOne/vibe-coding-agent';
+
+// Taking a copy of this template is a console flow, so the button is a link out
+// rather than an action this app can finish. The query string is the one the
+// README badge uses — it is what tells the console which template to open — and
+// the host splits the same way the contact URL does, because the two consoles are
+// separate deployments and neither can sign in the other's accounts.
+const TEMPLATE_DEPLOY_QUERY = 'template=vibe-coding-agent&from=within&fromAgent=1&agentLang=typescript';
+const EDGEONE_AI_DEPLOY_URL = `https://edgeone.ai/makers/new?${TEMPLATE_DEPLOY_QUERY}`;
+export const TENCENT_CLOUD_DEPLOY_URL = `https://console.cloud.tencent.com/edgeone/makers/new?${TEMPLATE_DEPLOY_QUERY}`;
+const EDGEONE_AI_CONTACT_URL = 'https://pages.edgeone.ai/contact?source=pages-home';
+export const TENCENT_CLOUD_CONTACT_URL = 'https://cloud.tencent.com/online-service?from=connect-us';
+// 认领部署（EdgeOne）功能暂不上线，先隐藏入口。上线时改回 true 即可。
+export const CLAIM_DEPLOY_ENABLED = false;
+
+export function getDeployUrl(domain: string) {
+  return domain === 'edgeone.dev' ? EDGEONE_AI_DEPLOY_URL : TENCENT_CLOUD_DEPLOY_URL;
+}
+
+export function getContactUrl(domain: string) {
+  return domain === 'edgeone.dev' ? EDGEONE_AI_CONTACT_URL : TENCENT_CLOUD_CONTACT_URL;
+}
+
+// Decode a base64 string into a Blob. The source archive arrives base64-encoded
+// inside a JSON envelope (the agent proxy only transports text reliably).
+export function base64ToBlob(base64: string, contentType: string): Blob {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new Blob([bytes], { type: contentType });
+}
+
+export function downloadTextFile(filename: string, content: string, mimeType = 'application/x-ndjson') {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+}
