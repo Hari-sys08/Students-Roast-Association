@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f0e8">
+  <title>SRA — Students Roast Association</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#">
+      <span class="brand-mark">S</span>
+      <span>SRA</span>
+    </a>
+
+    <nav>
+      <a href="#polls">Polls</a>
+      <a href="#memes">Memes</a>
+      <a href="#dropbox">Dropbox</a>
+    </nav>
+
+    <a class="staff-link" href="admin.html">staff</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">student-run · anonymous · slightly chaotic</p>
+
+        <h1>
+          A place for the stuff
+          <em>we actually talk about.</em>
+        </h1>
+
+        <p class="lede">
+          Polls, memes, random observations and the occasional brutally honest
+          suggestion. No school-poster energy.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button" href="#polls">See what's happening</a>
+          <a class="underlink" href="#dropbox">I have something to say →</a>
+        </div>
+      </div>
+
+      <aside class="notice-card">
+        <div class="notice-top">
+          <span>THE BOARD</span>
+          <span>13 SEP</span>
+        </div>
+
+        <div class="notice-space"></div>
+
+        <p class="notice-label">Today's mood</p>
+        <p class="notice-main">“Can this period just end?”</p>
+
+        <div class="rule"></div>
+
+        <p class="notice-foot">
+          Unofficially approved by students everywhere.
+        </p>
+      </aside>
+    </section>
+
+    <section class="stats">
+      <div>
+        <strong id="statVotes">—</strong>
+        <span>poll votes</span>
+      </div>
+
+      <div>
+        <strong id="statMemes">—</strong>
+        <span>memes in the arena</span>
+      </div>
+
+      <div>
+        <strong id="statIdeas">—</strong>
+        <span>things submitted</span>
+      </div>
+
+      <div class="online">
+        <i></i>
+        running normally
+      </div>
+    </section>
+
+    <section class="section" id="polls">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">01 / vote</p>
+          <h2>What are we saying today?</h2>
+        </div>
+
+        <p>One vote each. No overthinking.</p>
+      </div>
+
+      <div id="pollList" class="poll-grid"></div>
+    </section>
+
+    <section class="section section-grey" id="memes">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">02 / meme arena</p>
+          <h2>The ones that survived moderation.</h2>
+        </div>
+
+        <p>Rate the joke, not the person.</p>
+      </div>
+
+      <div id="memeList" class="meme-grid"></div>
+
+      <div class="upload-box">
+        <div>
+          <p class="eyebrow">Got one?</p>
+          <h3>Send a meme to the queue.</h3>
+          <p>Images are checked before they appear publicly.</p>
+        </div>
+
+        <label class="file-button">
+          Choose image
+          <input
+            id="memeFile"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+          >
+        </label>
+
+        <p id="uploadStatus" class="form-note"></p>
+      </div>
+    </section>
+
+    <section class="drop-section" id="dropbox">
+      <div>
+        <p class="eyebrow">03 / dropbox</p>
+        <h2>Tell us something.</h2>
+
+        <p class="intro">
+          Feedback, a poll idea, a random observation, or a meme caption that
+          deserves better. Keep it decent. Keep it interesting.
+        </p>
+
+        <div class="pills">
+          <span>anonymous by default</span>
+          <span>human moderation</span>
+          <span>no personal attacks</span>
+        </div>
+      </div>
+
+      <form id="submissionForm">
+        <label>
+          What is it?
+          <select name="type">
+            <option value="feedback">Feedback</option>
+            <option value="meme_idea">Meme idea</option>
+            <option value="poll_idea">Poll idea</option>
+            <option value="observation">Random observation</option>
+          </select>
+        </label>
+
+        <label>
+          Nickname <small>(optional)</small>
+          <input
+            name="nickname"
+            maxlength="40"
+            placeholder="leave blank for anonymous"
+          >
+        </label>
+
+        <label>
+          Your message
+          <textarea
+            name="message"
+            maxlength="600"
+            required
+            placeholder="Okay, hear me out..."
+          ></textarea>
+        </label>
+
+        <button class="button" type="submit">Send it</button>
+        <p id="formStatus" class="form-note"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <span>Students Roast Association</span>
+    <span>made by students, for students.</span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
